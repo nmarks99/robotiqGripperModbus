@@ -1,11 +1,11 @@
-# ../../bin/${EPICS_HOST_ARCH}/gripperTest st.cmd
+# ../../bin/${EPICS_HOST_ARCH}/riqTest st.cmd
 < envPaths
 
-dbLoadDatabase("../../dbd/iocgripperTestLinux.dbd")
-iocgripperTestLinux_registerRecordDeviceDriver(pdbbase)
+dbLoadDatabase("../../dbd/iocriqTestLinux.dbd")
+iocriqTestLinux_registerRecordDeviceDriver(pdbbase)
 
 epicsEnvSet("IOCSH_PS1", "$(IOC)>")
-epicsEnvSet("PREFIX", "gripperTest:")
+epicsEnvSet("PREFIX", "riqTest:")
 
 drvAsynSerialPortConfigure("ROBOTIQ_SERIAL", "/dev/ttyACM0", 0, 0, 0)
 asynSetOption("ROBOTIQ_SERIAL",0,"baud","115200")
@@ -35,9 +35,9 @@ drvModbusAsynConfigure("ROBOTIQ_READ", "ROBOTIQ_SERIAL",  0x0009, 3,  0x07D0, 3,
 drvModbusAsynConfigure("ROBOTIQ_WRITE", "ROBOTIQ_SERIAL", 0x0009, 16, 0x03E8, 3, "UINT16", 0, "robotiq")
 
 
-# dbLoadRecords("status.db", "P=$(PREFIX),R=Gripper,PORT=ROBOTIQ_READ")
-# dbLoadRecords("control.db", "P=$(PREFIX),R=Gripper,PORT=ROBOTIQ_WRITE")
-dbLoadRecords("robotiq_gripper_modbus.db", "P=$(PREFIX),R=Gripper,IN_PORT=ROBOTIQ_READ,OUT_PORT=ROBOTIQ_WRITE")
+# dbLoadRecords("status.db", "P=$(PREFIX),R=riqTestper,PORT=ROBOTIQ_READ")
+# dbLoadRecords("control.db", "P=$(PREFIX),R=riqTestper,PORT=ROBOTIQ_WRITE")
+dbLoadRecords("robotiq_gripper_modbus.db", "P=$(PREFIX),R=riqTestper,IN_PORT=ROBOTIQ_READ,OUT_PORT=ROBOTIQ_WRITE")
 
 ###############################################################################
 iocInit
