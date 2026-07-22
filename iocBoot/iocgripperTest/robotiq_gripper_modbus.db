@@ -1,0 +1,206 @@
+###############
+### CONTROL ###
+###############
+#
+## Offset 0: Bytes 0/1
+# Byte 0: ACTION_REQUEST
+record(mbboDirect, "$(P)$(R):ActionRequest") {
+    field(DTYP, "asynUInt32Digital")
+    field(OUT,  "@asynMask($(OUT_PORT) 0 0xFFFF)")
+}
+
+# Bit 8 = rACT
+record(bo, "$(P)$(R):Activate") {
+    field(OUT,  "$(P)$(R):ActionRequest.B8 PP")
+    field(ZNAM, "NO")
+    field(ONAM, "YES")
+}
+
+# Bit 11 = rGTO
+record(bo, "$(P)$(R):Move") {
+    field(OUT,  "$(P)$(R):ActionRequest.BB PP")
+    field(ZNAM, "NO")
+    field(ONAM, "YES")
+}
+
+# Bit 12 = rATR
+record(bo, "$(P)$(R):AutoRelease") {
+    field(OUT,  "$(P)$(R):ActionRequest.BC PP")
+    field(ZNAM, "NO")
+    field(ONAM, "YES")
+}
+
+# Bit 13 = rARD
+record(bo, "$(P)$(R):AutoReleaseDir") {
+    field(OUT,  "$(P)$(R):ActionRequest.BD PP")
+    field(ZNAM, "Closing")
+    field(ONAM, "Opening")
+}
+
+
+
+### Offset 1: Bytes 2/3 ###
+
+# Byte 2: RESERVED
+# Byte 3: POSITION REQUEST
+record(longout, "$(P)$(R):Position") {
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asynMask($(OUT_PORT) 1 0x00FF)")
+    field(DRVH, 255)
+    field(DRVL, 0)
+}
+
+
+
+### Offset 2: Bytes 4/5 ###
+
+# Byte 4: SPEED
+# Byte 5: FORCE
+
+record(longout, "$(P)$(R):SpeedForceRegister") {
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(OUT_PORT) 2)")
+    field(DRVH, 0xFFFF)
+    field(DRVL, 0)
+}
+
+record(longout, "$(P)$(R):Speed") {
+    field(DRVH, 255)
+    field(DRVL, 0)
+    field(VAL, 255)
+    field(PINI, "YES")
+    field(FLNK, "$(P)$(R):calc_speed_force.PROC")
+}
+
+record(longout, "$(P)$(R):Force") {
+    field(DRVH, 255)
+    field(DRVL, 0)
+    field(VAL, 255)
+    field(PINI, "YES")
+    field(FLNK, "$(P)$(R):calc_speed_force.PROC")
+}
+
+record(calcout, "$(P)$(R):calc_speed_force") {
+    field(INPA, "$(P)$(R):Speed.VAL")
+    field(INPB, "$(P)$(R):Force.VAL")
+    field(CALC, "(A << 8) | (B & 0x00FF)")
+    field(OUT, "$(P)$(R):SpeedForceRegister.VAL PP")
+}
+
+
+
+record(seq, "$(P)$(R):Open") {
+    field(DOL0, 0)
+    field(LNK0, "$(P)$(R):Position.VAL PP")
+    field(DOL1, 1)
+    field(LNK1, "$(P)$(R):Move.VAL PP")
+}
+
+record(seq, "$(P)$(R):Close") {
+    field(DOL0, 255)
+    field(LNK0, "$(P)$(R):Position.VAL PP")
+    field(DOL1, 1)
+    field(LNK1, "$(P)$(R):Move.VAL PP")
+}
+
+
+
+##############
+### STATUS ###
+##############
+
+### Offset 0 ###
+# Byte 0: GRIPPER STATUS
+# | 7 | 6 | 5 | 4 |  3   | 2 | 1 |  0   |
+# | gOBJ  | gSTA  | gGTO | ----- | gACT |
+#
+# Byte 1: RESERVED
+
+# Bit 0: gACT - Activation status
+record(bi, "$(P)$(R):Active") {
+    field(DTYP, "asynUInt32Digital")
+    field(INP,  "@asynMask($(IN_PORT) 0 0x0100)")
+    field(SCAN, "I/O Intr")
+    field(ZNAM, "Not Active")
+    field(ONAM, "Active")
+}
+
+# Bit 3: gGTO - "GoTo" bit value
+record(bi, "$(P)$(R):GoStatus") {
+    field(DTYP, "asynUInt32Digital")
+    field(INP,  "@asynMask($(IN_PORT) 0 0x0800)")
+    field(SCAN, "I/O Intr")
+    field(ZNAM, "Stop")
+    field(ONAM, "Go")
+}
+
+# Bit 4-5: gSTA - Dynamic info about gripper activation
+record(mbbi, "$(P)$(R):ActivationStatus") {
+    field(DTYP, "asynUInt32Digital")
+    field(INP,  "@asynMask($(IN_PORT) 0 0x3000)")
+    field(SCAN, "I/O Intr")
+    field(ZRST, "Not Active")
+    field(ONST, "Activating")
+    field(TWST, "-")
+    field(THST, "Complete")
+}
+
+# Bits 6–7: Moving and object detection
+record(mbbi, "$(P)$(R):MotionStatus") {
+    field(DTYP, "asynUInt32Digital")
+    field(INP,  "@asynMask($(IN_PORT) 0 0xC000)")
+    field(SCAN, "I/O Intr")
+    field(ZRVL, 0)
+    field(ZRST, "Moving")
+    field(ONVL, 1)
+    field(ONST, "Stopped outer")
+    field(TWVL, 2)
+    field(TWST, "Stopped inner")
+    field(THVL, 3)
+    field(THST, "At target")
+}
+
+### Offset 1 ###
+# Byte 2: FAULT STATUS
+# | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
+# |      kFLT     |      gFLT     |
+# Byte 3: POSITION REQUEST ECHO
+# | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
+# |              gPR              |
+record(longin, "$(P)$(R):bytes_2_3") {
+    field(DTYP, "asynInt32")
+    field(INP, "@asyn($(IN_PORT) 1)")
+    field(SCAN, "I/O Intr")
+}
+record(calcout, "$(P)$(R):FaultStatus") {
+    field(INPA, "$(P)$(R):bytes_2_3.VAL CP")
+    field(CALC, "(A>>8) & 0xFF")
+}
+
+record(calcout, "$(P)$(R):PositionTargetRBV") {
+    field(INPA, "$(P)$(R):bytes_2_3.VAL CP")
+    field(CALC, "A & 0xFF")
+}
+
+### Offset 2 ###
+# Byte 4: POSITION
+# | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
+# |              gPO              |
+# Byte 5: CURRENT
+# | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
+# |              gCU              |
+record(longin, "$(P)$(R):bytes_4_5") {
+    field(DTYP, "asynInt32")
+    field(INP, "@asyn($(IN_PORT) 2)")
+    field(SCAN, "I/O Intr")
+}
+
+record(calcout, "$(P)$(R):PositionRBV") {
+    field(INPA, "$(P)$(R):bytes_4_5.VAL CP")
+    field(CALC, "(A>>8) & 0xFF")
+}
+
+record(calcout, "$(P)$(R):Current") {
+    field(INPA, "$(P)$(R):bytes_4_5.VAL CP")
+    field(CALC, "A & 0xFF")
+}
