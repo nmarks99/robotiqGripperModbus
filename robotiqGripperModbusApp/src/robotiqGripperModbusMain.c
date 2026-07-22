@@ -1,4 +1,4 @@
-/* riqTestMain.c */
+/* robotiqGripperModbusMain.c */
 /* Author:  Ron Sluiter */
 
 #include <stddef.h>

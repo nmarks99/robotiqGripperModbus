@@ -1,12 +1,12 @@
 
 file {
-	name="/home/beams0/NMARKS/devel/robotiq-gripper-modbus/gripperTest/iocBoot/iocgripperTest/newDisplay.adl"
+	name="/home/beams0/NMARKS/devel/robotiq-gripper-modbus/robotiqGripperModbus/iocBoot/iocrobotiqGripperModbus/newDisplay.adl"
 	version=030111
 }
 display {
 	object {
-		x=3132
-		y=762
+		x=3122
+		y=754
 		width=400
 		height=400
 	}
@@ -95,7 +95,7 @@ display {
 		height=30
 	}
 	control {
-		chan="gripperTest:Open.PROC"
+		chan="$(P)$(R):Open.PROC"
 		clr=14
 		bclr=51
 	}
@@ -110,7 +110,7 @@ display {
 		height=30
 	}
 	control {
-		chan="gripperTest:Close.PROC"
+		chan="$(P)$(R):Close.PROC"
 		clr=14
 		bclr=51
 	}
@@ -125,7 +125,7 @@ display {
 		height=25
 	}
 	control {
-		chan="gripperTest:Speed.VAL"
+		chan="$(P)$(R):Speed.VAL"
 		clr=14
 		bclr=51
 	}
@@ -140,7 +140,7 @@ display {
 		height=25
 	}
 	control {
-		chan="gripperTest:Force.VAL"
+		chan="$(P)$(R):Force.VAL"
 		clr=14
 		bclr=51
 	}
@@ -155,7 +155,7 @@ display {
 		height=30
 	}
 	control {
-		chan="gripperTest:Activate.VAL"
+		chan="$(P)$(R):Activate.VAL"
 		clr=14
 		bclr=51
 	}
@@ -169,7 +169,22 @@ display {
 		height=23
 	}
 	monitor {
-		chan="gripperTest:MotionStatus"
+		chan="$(P)$(R):MotionStatus"
+		clr=14
+		bclr=4
+	}
+	limits {
+	}
+}
+"text update" {
+	object {
+		x=155
+		y=130
+		width=189
+		height=23
+	}
+	monitor {
+		chan="$(P)$(R):PositionRBV.VAL"
 		clr=14
 		bclr=4
 	}

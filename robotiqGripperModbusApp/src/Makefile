@@ -7,8 +7,8 @@ include $(TOP)/configure/CONFIG
 
 # PROD_NAME is used by ADCORE to add libraries
 # DBD_PREFIX is used by ADCORE to add dbd files
-PROD_NAME = riqTest
-DBD_PREFIX = iocriqTest
+PROD_NAME = robotiqGripperModbus
+DBD_PREFIX = iocrobotiqGripperModbus
 PROD_IOC = $(PROD_NAME)
 
 # Note that the order in which .dbd files and libraries are added to a list

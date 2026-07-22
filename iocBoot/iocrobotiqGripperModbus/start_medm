@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+medm -macro "P=${USER}:,R=Gripper" -x robotiq_gripper.adl
